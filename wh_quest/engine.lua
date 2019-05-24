@@ -48,8 +48,8 @@ end
 
 -- Interaction coroutine helpers
 
-function M.show_dialog(dialog)
-    M.delegate.show_dialog(dialog)
+function M.show_dialogue(dialogue)
+    M.delegate.show_dialogue(dialogue)
     return coroutine.yield()
 end
 
@@ -64,7 +64,7 @@ function M.finish_act()
 end
 
 
-function M.on_dialog_done()
+function M.on_dialogue_done()
     coroutine.resume(current_co)
 end
 

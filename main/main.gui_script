@@ -1,12 +1,12 @@
 local engine = require("wh_quest.engine")
 
-local inventoryNodes = nil
-local isShowingDialog = false
-local isShowingChoice = false
-local dialogCo = nil
-local choiceCo = nil
+local inventory_nodes = nil
+local is_showing_dialogue = false
+local is_showing_choice = false
+local dialogue_co = nil
+local choice_co = nil
 
-local function textNode(x, y, text, color)
+local function text_node(x, y, text, color)
 	local text = gui.new_text_node(vmath.vector3(x, y, 0), text)
 	gui.set_font(text, "font")
 	gui.set_pivot(text, gui.PIVOT_SW)
@@ -15,18 +15,18 @@ local function textNode(x, y, text, color)
 	return text
 end
 
-local function coverNode()
+local function cover_node()
 	local node = gui.new_box_node(vmath.vector3(0, 0, 0), vmath.vector3(960, 150, 0))
 	gui.set_pivot(node, gui.PIVOT_SW)
 	gui.set_color(node, vmath.vector4(0, 0, 0, 0.5))
 	return node
 end
 
-local function updateInventory()
-	for _, node in ipairs(inventoryNodes) do
+local function update_inventory()
+	for _, node in ipairs(inventory_nodes) do
 		gui.delete_node(node)
 	end
-	inventoryNodes = {}
+	inventory_nodes = {}
 
 	local inventory = engine.inventory.items
 	
@@ -34,45 +34,45 @@ local function updateInventory()
 		local node = gui.new_box_node(vmath.vector3(i * 84 - 36, 592, 0), vmath.vector3(80, 80, 0))
 		gui.set_texture(node, "sprites")
 		gui.play_flipbook(node, engine.level.itemSprites[v])
-		table.insert(inventoryNodes, node)
+		table.insert(inventory_nodes, node)
 	end
 end
 
-local function showDialog(dialog)
-	msg.post("/Clerk#script", "pause")
+local function show_dialogue(dialogue)
+	msg.post("/player#script", "pause")
 
-	dialogCo = coroutine.create(function()
-		local cover = coverNode()
-		for i, phrase in ipairs(dialog) do
-			local name = textNode(20, 120, phrase[1], vmath.vector3(0, 1, 0))
-			local text = textNode(20, 90, phrase[2], vmath.vector3(1, 1, 1))
+	dialogue_co = coroutine.create(function()
+		local cover = cover_node()
+		for i, phrase in ipairs(dialogue) do
+			local name = text_node(20, 120, phrase[1], vmath.vector3(0, 1, 0))
+			local text = text_node(20, 90, phrase[2], vmath.vector3(1, 1, 1))
 			coroutine.yield()
 			gui.delete_node(name)
 			gui.delete_node(text)
 		end
 		gui.delete_node(cover)
-		msg.post("/Clerk#script", "resume")
-		engine.on_dialog_done()
-		isShowingDialog = false
-		dialogCo = nil
+		msg.post("/player#script", "resume")
+		engine.on_dialogue_done()
+		is_showing_dialogue = false
+		dialogue_co = nil
 	end)
-	isShowingDialog = true
-	coroutine.resume(dialogCo)
+	is_showing_dialogue = true
+	coroutine.resume(dialogue_co)
 end
 
-local function showChoice(options)
-	msg.post("/Clerk#script", "pause")
+local function show_choice(options)
+	msg.post("/player#script", "pause")
 
-	choiceCo = coroutine.create(function()
-		local cover = coverNode()
+	choice_co = coroutine.create(function()
+		local cover = cover_node()
 		local nodes = {}
 		-- Create choice list
 		for i, option in ipairs(options) do
 			local color = (i == 1) and vmath.vector3(0, 1, 0) or vmath.vector3(1, 1, 1)
-			local text = textNode(20, 140 - i * 24, option, color)
+			local text = text_node(20, 140 - i * 24, option, color)
 			table.insert(nodes, text)
 		end
-		local pointer = textNode(2, 0, ">", vmath.vector3(1, 1, 0))
+		local pointer = text_node(2, 0, ">", vmath.vector3(1, 1, 0))
 		-- Select
 		local done = false
 		local selected = 1
@@ -99,47 +99,37 @@ local function showChoice(options)
 		end
 		gui.delete_node(pointer)
 		gui.delete_node(cover)
-		msg.post("/Clerk#script", "resume")
+		msg.post("/player#script", "resume")
 		engine.on_choice_selected(selected)	
-		isShowingChoice = false
-		choiceCo = nil
+		is_showing_choice = false
+		choice_co = nil
 	end)
-	isShowingChoice = true
-	coroutine.resume(choiceCo)
+	is_showing_choice = true
+	coroutine.resume(choice_co)
 end
 
 
 
 function init(self)
-	inventoryNodes = {}
+	inventory_nodes = {}
 	msg.post(".", "acquire_input_focus")
 end
 
-function update(self, dt)
-	-- Add update code here
-	-- Remove this function if not needed
-end
-
 function on_message(self, message_id, message, sender)
-	if message_id == hash("updateInventory") then
-		updateInventory()
-	elseif message_id == hash("showDialog") then
-		showDialog(message.dialog)
-	elseif message_id == hash("showChoice") then
-		showChoice(message.options)
+	if message_id == hash("update_inventory") then
+		update_inventory()
+	elseif message_id == hash("show_dialogue") then
+		show_dialogue(message.dialogue)
+	elseif message_id == hash("show_choice") then
+		show_choice(message.options)
 	end
 end
 
 function on_input(self, action_id, action)
-	if isShowingDialog and action_id == hash("space") and action.released == true then
-		coroutine.resume(dialogCo)
+	if is_showing_dialogue and action_id == hash("space") and action.released == true then
+		coroutine.resume(dialogue_co)
 	end
-	if isShowingChoice and action.released == true then
-		coroutine.resume(choiceCo, action_id)
+	if is_showing_choice and action.released == true then
+		coroutine.resume(choice_co, action_id)
 	end
-end
-
-function on_reload(self)
-	-- Add input-handling code here
-	-- Remove this function if not needed
 end

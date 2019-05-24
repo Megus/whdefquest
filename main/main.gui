@@ -1,4 +1,4 @@
-script: "/main/Gameplay.gui_script"
+script: "/main/main.gui_script"
 fonts {
   name: "font"
   font: "/builtins/fonts/system_font.font"

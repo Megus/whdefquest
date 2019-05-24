@@ -1,0 +1,63 @@
+local engine = require("wh_quest.engine")
+local level = require("main.level")
+
+local markers = {}
+
+local function show_marker(id)
+	local position = go.get_position(id)
+	position.y = position.y - 8
+	markers[id] = factory.create("#marker_factory", position, nil, nil, vmath.vector3(0.2, 0.2, 1))
+end
+
+local function hide_marker(id)
+	go.delete(markers[id])
+	markers[id] = nil
+end
+
+-- Quest engine delegate
+local function delegate(self)
+	local M = {}
+
+	function M.on_pick_item(item)
+		go.delete(item, true)
+	end
+
+	function M.on_update_inventory(items)
+		msg.post("#gui", "update_inventory")
+	end
+
+	function M.on_finish_act()
+		-- Nothing to do here yet
+	end
+
+	function M.show_dialogue(dialogue)
+		msg.post("#gui", "show_dialogue", {dialogue = dialogue})
+	end
+
+	function M.show_choice(options)
+		msg.post("#gui", "show_choice", {options = options})
+	end
+
+	return M
+end
+
+function init(self)
+	engine.init(level, delegate(self))
+	--msg.post("@system:", "toggle_physics_debug") 
+end
+
+function final(self)
+	engine.final()
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("new_collision") then
+		show_marker(message.id)
+	elseif message_id == hash("finished_collision") then
+		hide_marker(message.id)
+	elseif message_id == hash("pick_item") then
+		engine.inventory.pick_item(message.id)
+	elseif message_id == hash("act_npc") then
+		engine.act_npc(message.id)
+	end
+end
