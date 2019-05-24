@@ -1,0 +1,145 @@
+local engine = require("wh_quest.engine")
+
+local inventoryNodes = nil
+local isShowingDialog = false
+local isShowingChoice = false
+local dialogCo = nil
+local choiceCo = nil
+
+local function textNode(x, y, text, color)
+	local text = gui.new_text_node(vmath.vector3(x, y, 0), text)
+	gui.set_font(text, "font")
+	gui.set_pivot(text, gui.PIVOT_SW)
+	gui.set_scale(text, vmath.vector3(1.5, 1.5, 1))
+	gui.set_color(text, color)
+	return text
+end
+
+local function coverNode()
+	local node = gui.new_box_node(vmath.vector3(0, 0, 0), vmath.vector3(960, 150, 0))
+	gui.set_pivot(node, gui.PIVOT_SW)
+	gui.set_color(node, vmath.vector4(0, 0, 0, 0.5))
+	return node
+end
+
+local function updateInventory()
+	for _, node in ipairs(inventoryNodes) do
+		gui.delete_node(node)
+	end
+	inventoryNodes = {}
+
+	local inventory = engine.inventory.items
+	
+	for i, v in ipairs(inventory) do
+		local node = gui.new_box_node(vmath.vector3(i * 84 - 36, 592, 0), vmath.vector3(80, 80, 0))
+		gui.set_texture(node, "sprites")
+		gui.play_flipbook(node, engine.level.itemSprites[v])
+		table.insert(inventoryNodes, node)
+	end
+end
+
+local function showDialog(dialog)
+	msg.post("/Clerk#script", "pause")
+
+	dialogCo = coroutine.create(function()
+		local cover = coverNode()
+		for i, phrase in ipairs(dialog) do
+			local name = textNode(20, 120, phrase[1], vmath.vector3(0, 1, 0))
+			local text = textNode(20, 90, phrase[2], vmath.vector3(1, 1, 1))
+			coroutine.yield()
+			gui.delete_node(name)
+			gui.delete_node(text)
+		end
+		gui.delete_node(cover)
+		msg.post("/Clerk#script", "resume")
+		engine.on_dialog_done()
+		isShowingDialog = false
+		dialogCo = nil
+	end)
+	isShowingDialog = true
+	coroutine.resume(dialogCo)
+end
+
+local function showChoice(options)
+	msg.post("/Clerk#script", "pause")
+
+	choiceCo = coroutine.create(function()
+		local cover = coverNode()
+		local nodes = {}
+		-- Create choice list
+		for i, option in ipairs(options) do
+			local color = (i == 1) and vmath.vector3(0, 1, 0) or vmath.vector3(1, 1, 1)
+			local text = textNode(20, 140 - i * 24, option, color)
+			table.insert(nodes, text)
+		end
+		local pointer = textNode(2, 0, ">", vmath.vector3(1, 1, 0))
+		-- Select
+		local done = false
+		local selected = 1
+		repeat
+			gui.set_position(pointer, vmath.vector3(2, 116 - selected * 24, 0))
+			local action = coroutine.yield()
+			if action == hash("space") then
+				done = true
+			elseif action == hash("up") then
+				selected = selected - 1
+				if selected <= 0 then
+					selected = #options - 1
+				end
+			elseif action == hash("down") then
+				selected = selected + 1
+				if selected >= #options then
+					selected = 1
+				end
+			end
+		until done == true
+
+		for i, node in ipairs(nodes) do
+			gui.delete_node(node)
+		end
+		gui.delete_node(pointer)
+		gui.delete_node(cover)
+		msg.post("/Clerk#script", "resume")
+		engine.on_choice_selected(selected)	
+		isShowingChoice = false
+		choiceCo = nil
+	end)
+	isShowingChoice = true
+	coroutine.resume(choiceCo)
+end
+
+
+
+function init(self)
+	inventoryNodes = {}
+	msg.post(".", "acquire_input_focus")
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("updateInventory") then
+		updateInventory()
+	elseif message_id == hash("showDialog") then
+		showDialog(message.dialog)
+	elseif message_id == hash("showChoice") then
+		showChoice(message.options)
+	end
+end
+
+function on_input(self, action_id, action)
+	if isShowingDialog and action_id == hash("space") and action.released == true then
+		coroutine.resume(dialogCo)
+	end
+	if isShowingChoice and action.released == true then
+		coroutine.resume(choiceCo, action_id)
+	end
+end
+
+function on_reload(self)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end

@@ -1,0 +1,16 @@
+[bootstrap]
+main_collection = /main/main.collectionc
+render = /orthographic/render/orthographic.renderc
+
+[script]
+shared_state = 1
+
+[display]
+width = 960
+height = 640
+high_dpi = 1
+
+[project]
+title = Clerk
+dependencies = https://github.com/britzl/defold-orthographic/archive/master.zip
+

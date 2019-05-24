@@ -1,0 +1,18 @@
+script: "/main/Gameplay.gui_script"
+fonts {
+  name: "font"
+  font: "/builtins/fonts/system_font.font"
+}
+textures {
+  name: "sprites"
+  texture: "/demo_assets/tiles.tilesource"
+}
+background_color {
+  x: 0.0
+  y: 0.0
+  z: 0.0
+  w: 0.0
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT
+max_nodes: 512

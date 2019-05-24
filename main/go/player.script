@@ -1,0 +1,81 @@
+local speed = 2.0
+local isPaused = false
+
+local function move(dx, dy)
+	local fromPosition = go.get_position()
+	local toPosition = go.get_position()
+	toPosition.x = toPosition.x + dx * (12 + speed)
+	toPosition.y = toPosition.y + dy * (12 + speed)
+
+	local response = physics.raycast(fromPosition, toPosition, {hash("walls")})
+	if response == nil then
+		toPosition = go.get_position()
+		toPosition.x = toPosition.x + dx * speed
+		toPosition.y = toPosition.y + dy * speed
+		go.set_position(toPosition)
+	end
+end
+
+local function doAction(self)
+	for id, value in pairs(self.oldCollisions) do
+		if value == hash("item") then
+			-- Pick item
+			msg.post("/controller#script", "pickItem", {id = id})
+		elseif value == hash("npc") then
+			-- Act with NPC
+			msg.post("/controller#script", "actNpc", {id = id})
+		end
+	end
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	isPaused = false
+	self.oldCollisions = {}
+	self.newCollisions = {}
+end
+
+function update(self, dt)
+	for id, value in pairs(self.newCollisions) do
+		if self.oldCollisions[id] == nil then
+			-- New collision
+			msg.post("/controller#script", "newCollision", {id = id, group = value})
+			self.oldCollisions[id] = value
+		end
+	end
+	for id, value in pairs(self.oldCollisions) do
+		if self.newCollisions[id] == nil then
+			-- Finished colliding
+			msg.post("/controller#script", "finishedCollision", {id = id, group = value})
+			self.oldCollisions[id] = nil
+		end
+	end
+
+	self.newCollisions = {}
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("collision_response") then
+		self.newCollisions[message.other_id] = message.other_group
+	elseif message_id == hash("pause") then
+		isPaused = true
+	elseif message_id == hash("resume") then
+		isPaused = false
+	end
+end
+
+function on_input(self, action_id, action)
+	if isPaused then return end
+
+	if action_id == hash("left") then
+		move(-1, 0)
+	elseif action_id == hash("right") then
+		move(1, 0)
+	elseif action_id == hash("up") then
+		move(0, 1)
+	elseif action_id == hash("down") then
+		move(0, -1)
+	elseif action_id == hash("space") and action.released == true then
+		doAction(self)
+	end
+end
