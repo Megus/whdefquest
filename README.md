@@ -9,7 +9,7 @@ The library itself doesn't use any Defold-specific API, so you can use it with a
 
 To add whDefQuest to your Defold project, add this link to a dependency list:
 
-[https://github.com/Megus/whdefquest/archive/1.0.0.zip]
+https://github.com/Megus/whdefquest/archive/1.0.0.zip
 
 ## Table of contents
 
