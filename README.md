@@ -1,6 +1,6 @@
 # whDefQuest
 
-A little helper library for quest games created with Defold game defquest. The basic functions it gives are:
+A little helper library for quest games created with Defold game engine. The basic functions it gives are:
 
 - Inventory management
 - Dialogues with NPC
