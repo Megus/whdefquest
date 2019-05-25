@@ -1,11 +1,11 @@
-local speed = 2.0
+local speed = 6.0
 local is_paused = false
 
 local function move(dx, dy)
 	local from = go.get_position()
 	local to = go.get_position()
-	to.x = to.x + dx * (12 + speed)
-	to.y = to.y + dy * (12 + speed)
+	to.x = to.x + dx * (28 + speed)
+	to.y = to.y + dy * (28 + speed)
 
 	local response = physics.raycast(from, to, {hash("walls")})
 	if response == nil then

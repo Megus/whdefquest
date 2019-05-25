@@ -3,8 +3,8 @@ instances {
   id: "player"
   prototype: "/main/go/player.go"
   position {
-    x: 67.0
-    y: 53.0
+    x: 282.0
+    y: 249.0
     z: 0.0
   }
   rotation {
@@ -37,7 +37,7 @@ instances {
     id: "script"
     properties {
       id: "zoom"
-      value: "8.0"
+      value: "1.5"
       type: PROPERTY_TYPE_NUMBER
     }
     properties {
@@ -66,8 +66,8 @@ instances {
   id: "npc1"
   prototype: "/main/go/npc.go"
   position {
-    x: 169.0
-    y: 100.0
+    x: 543.0
+    y: 244.0
     z: 0.0
   }
   rotation {
@@ -86,8 +86,8 @@ instances {
   id: "item1"
   prototype: "/main/go/item.go"
   position {
-    x: 74.0
-    y: 108.0
+    x: 1039.0
+    y: 589.0
     z: 0.0
   }
   rotation {
@@ -106,8 +106,8 @@ instances {
   id: "item2"
   prototype: "/main/go/item2.go"
   position {
-    x: 138.0
-    y: 52.0
+    x: 1017.0
+    y: 264.0
     z: 0.0
   }
   rotation {

@@ -5,8 +5,8 @@ local markers = {}
 
 local function show_marker(id)
 	local position = go.get_position(id)
-	position.y = position.y - 8
-	markers[id] = factory.create("#marker_factory", position, nil, nil, vmath.vector3(0.2, 0.2, 1))
+	position.y = position.y - 64
+	markers[id] = factory.create("#marker_factory", position)
 end
 
 local function hide_marker(id)
