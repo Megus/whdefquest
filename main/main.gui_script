@@ -1,4 +1,4 @@
-local engine = require("wh_quest.engine")
+local defquest = require("whdefquest.defquest")
 
 local inventory_nodes = nil
 local is_showing_dialogue = false
@@ -28,12 +28,12 @@ local function update_inventory()
 	end
 	inventory_nodes = {}
 
-	local inventory = engine.inventory.items
+	local inventory = defquest.inventory.items
 	
 	for i, v in ipairs(inventory) do
 		local node = gui.new_box_node(vmath.vector3(i * 84 - 36, 592, 0), vmath.vector3(80, 80, 0))
 		gui.set_texture(node, "sprites")
-		gui.play_flipbook(node, engine.level.itemSprites[v])
+		gui.play_flipbook(node, defquest.level.itemSprites[v])
 		table.insert(inventory_nodes, node)
 	end
 end
@@ -52,7 +52,7 @@ local function show_dialogue(dialogue)
 		end
 		gui.delete_node(cover)
 		msg.post("/player#script", "resume")
-		engine.on_dialogue_done()
+		defquest.on_dialogue_done()
 		is_showing_dialogue = false
 		dialogue_co = nil
 	end)
@@ -100,7 +100,7 @@ local function show_choice(options)
 		gui.delete_node(pointer)
 		gui.delete_node(cover)
 		msg.post("/player#script", "resume")
-		engine.on_choice_selected(selected)	
+		defquest.on_choice_selected(selected)	
 		is_showing_choice = false
 		choice_co = nil
 	end)

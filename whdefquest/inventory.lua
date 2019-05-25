@@ -4,8 +4,8 @@ local M = {
 
 local e
 
-function M.init(engine)
-    e = engine
+function M.init(defquest)
+    e = defquest
     M.items = {}
     M.max_items = nil
 end

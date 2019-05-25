@@ -1,4 +1,4 @@
-local engine = require("wh_quest.engine")
+local defquest = require("whdefquest.defquest")
 local level = require("main.level")
 
 local markers = {}
@@ -14,7 +14,7 @@ local function hide_marker(id)
 	markers[id] = nil
 end
 
--- Quest engine delegate
+-- Quest defquest delegate
 local function delegate(self)
 	local M = {}
 
@@ -42,12 +42,12 @@ local function delegate(self)
 end
 
 function init(self)
-	engine.init(level, delegate(self))
+	defquest.init(level, delegate(self))
 	--msg.post("@system:", "toggle_physics_debug") 
 end
 
 function final(self)
-	engine.final()
+	defquest.final()
 end
 
 function on_message(self, message_id, message, sender)
@@ -56,8 +56,8 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == hash("finished_collision") then
 		hide_marker(message.id)
 	elseif message_id == hash("pick_item") then
-		engine.inventory.pick_item(message.id)
+		defquest.inventory.pick_item(message.id)
 	elseif message_id == hash("act_npc") then
-		engine.act_npc(message.id)
+		defquest.act_npc(message.id)
 	end
 end

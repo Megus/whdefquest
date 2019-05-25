@@ -1,4 +1,4 @@
-local inventory = require("wh_quest.inventory")
+local inventory = require("whdefquest.inventory")
 
 local M = {}
 
@@ -31,7 +31,7 @@ end
 function M.add_module(module)
     local name = module.module_name
     assert(name ~= nil, "Module must have a module_name field with the name")
-    assert(M[name] == nil, "Module name shouldn't conflict with engine functions")
+    assert(M[name] == nil, "Module name shouldn't conflict with defquest functions")
 
     M[name] = module
     modules[name] = module
