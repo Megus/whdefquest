@@ -33,7 +33,7 @@ local function update_inventory()
 	for i, v in ipairs(inventory) do
 		local node = gui.new_box_node(vmath.vector3(i * 84 - 36, 592, 0), vmath.vector3(80, 80, 0))
 		gui.set_texture(node, "sprites")
-		gui.play_flipbook(node, defquest.level.itemSprites[v])
+		gui.play_flipbook(node, defquest.level.item_sprites[v])
 		table.insert(inventory_nodes, node)
 	end
 end

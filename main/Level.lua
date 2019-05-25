@@ -1,70 +1,66 @@
 local M = {}
 
--- В этой таблице задаются спрайты для каждого предмета. Это нужно для показа инвентаря,
--- так как Defold не позволяет узнать спрайт
--- Ключи: хэши URI GO с предметами
--- Значения: названия спрайтов из sprites.atlas
-M.itemSprites = {
-    [hash("/Item1")] = "obj1",
-    [hash("/Item2")] = "obj2",
+-- I use this table to get animation from game object hash
+M.item_sprites = {
+    [hash("/item1")] = "obj1",
+    [hash("/item2")] = "obj2",
 }
 
--- Пример корутины диалога с NPC
+
+-- A sample NPC interaction coroutine
 local function npc1_1(defquest)
     return coroutine.create(function()
-        -- Вот так мы показываем диалог. Структура таблицы простая:
-        -- Каждый элемент списка — массив из двух элементов: говорящий, фраза
+        -- Show the dialogue using whDefQuest function
         defquest.show_dialogue({
             {"Me", "Hello!"},
             {"Bob", "Hello!"},
         })
-        -- Вот так мы предлагаем выбор из нескольких вариантов
+        -- And now show the choice
         local options = {
-            "What to answer?",    -- Сначала заголовок окна выбора
-            "1",                -- А теперь варианты ответа
-            "2",
+            "What to answer?",    -- Choice prompt
+            "A good day today, isn't it?", -- Answer variants
+            "Do you need something?",
         }
-        if defquest.inventory.has_item(hash("/Item1")) then
-            table.insert(options, "Give him Item1")
+        -- If we have a specific item, add another option
+        if defquest.inventory.has_item(hash("/item1")) then
+            table.insert(options, "Give him a ring")
         end
 
         local answer = defquest.show_choice(options)
+        -- answer is a number. 1 is "a good day..."
 
-        -- Ответ — число от 1. Т.е. тут на "Fuck off you too!" будет 1.
-
+        -- Depending on what we answered, show different dialogues
         if answer == 1 then
             defquest.show_dialogue({
-                {"Bob", "1"},
-                {"Me", "2"},
+                {"Bob", "Yes, definitely a good one!"},
+                {"Me", "Yeah. Bye!"},
             })
         elseif answer == 2 then
             defquest.show_dialogue({
-                {"Bob", "1"},
-                {"Me", "2"},
+                {"Bob", "Yes, I lost my ring"},
+                {"Me", "Okay, I'll try to find it"},
             })
         elseif answer == 3 then
-            defquest.inventory.remove_item(hash("/Item1"))
+            defquest.inventory.remove_item(hash("/item1"))
             defquest.show_dialogue({
-                {"Bob", "What a good Item1!"},
-                {"Me", "1"},
+                {"Bob", "Thank you for bringing my ring back!"},
+                {"Me", "You're welcome!"},
             })
         end
 
-        -- Обязательно вызываем finishAct в конце
+        -- We must call finish_act() in the end
         defquest.finish_act()
     end)
 end
 
 
-
--- Вызывается, когда игрок подбирает предмет. Тут можно что-то делать, если факт подбора
--- предмета на что-то влияет. Если ни на что не влияет, эту функцию можно просто убрать,
--- движок проверяет ее наличие и вызывает только в случае, если она есть.
+-- whDefQuest calls this function when a player picks an item. We can do something
+-- here, but it's not required. You can even not implement this function.
 function M.on_pick_item(defquest, item)
 
 end
 
--- Функция должна вернуть корутину, которая будет вести диалог с NPC
+-- This function should return a coroutine for interacting with an NPC
 function M.on_act_npc(defquest, npc)
     if npc == hash("/npc1") then
         return npc1_1(defquest)

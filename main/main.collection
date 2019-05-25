@@ -83,7 +83,7 @@ instances {
   }
 }
 instances {
-  id: "Item1"
+  id: "item1"
   prototype: "/main/go/item.go"
   position {
     x: 74.0
@@ -103,7 +103,7 @@ instances {
   }
 }
 instances {
-  id: "Item2"
+  id: "item2"
   prototype: "/main/go/item2.go"
   position {
     x: 138.0
