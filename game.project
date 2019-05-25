@@ -11,8 +11,9 @@ height = 640
 high_dpi = 1
 
 [project]
-title = Clerk
+title = whDefQuest
 dependencies = https://github.com/britzl/defold-orthographic/archive/master.zip
+version = 1.0.0
 
 [library]
 include_dirs = whdefquest
