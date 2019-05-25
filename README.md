@@ -7,6 +7,10 @@ A little helper library for quest games created with Defold game defquest. The b
 
 The library itself doesn't use any Defold-specific API, so you can use it with any other game engine.
 
+To add whDefQuest to your Defold project, add this link to a dependency list:
+
+[https://github.com/Megus/whdefquest/archive/1.0.0.zip]
+
 ## Table of contents
 
 - [How to use](#how-to-use)
