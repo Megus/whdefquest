@@ -7,6 +7,39 @@ A little helper library for quest games created with Defold game engine. The bas
 
 The library itself doesn't use any Defold-specific API, so you can use it with any other game engine.
 
+## Table of contents
+
+- [How to use](#how-to-use)
+- [Engine functions](#engine-functions)
+  - [```engine.init(level, delegate)```](#engineinitlevel-delegate)
+  - [```engine.final()```](#enginefinal)
+  - [```engine.add_module(module)```](engineadd_modulemodule)
+  - [```engine.act_npc(npc)```](#engineact_npcnpc)
+- [NPC interaction helper functions](#npc-interaction-helper-functions)
+  - [```engine.show_dialogue(dialogue)```](#engineshow_dialoguedialogue)
+  - [```engine.show_choice(options)```](#engineshow_choiceoptions)
+  - [```engine.finish_act()```](#enginefinish_act)
+  - [```engine.on_dialogue_done()```](#engineon_dialogue_done)
+  - [```engine.on_choice_selected(choice)```](#engineon_choice_selectedchoice)
+- [Inventory module functions](#inventory-module-functions)
+  - [```engine.inventory.pick_item(item)```](#engineinventorypick_itemitem)
+  - [```engine.inventory.remove_item(item)```](#engineinventoryremove_itemitem)
+  - [```engine.inventory.has_item(item)```](#engineinventoryhas_itemitem)
+- [Level table](#level-table)
+  - [```init()```](#init)
+  - [```final()```](#final)
+  - [```on_pick_item(engine, item)```](#on_pick_itemengine-item)
+  - [```on_act_npc(engine, npc)```](#on_act_npcengine-npc)
+- [Engine delegate](#engine-delegate)
+  - [```on_pick_item(item)```](#on_pick_itemitem)
+  - [```on_update_inventory(items)```](#on_update_inventoryitems)
+  - [```on_inventory_full()```](#on_inventory_full)
+  - [```on_finish_act()```](#on_finish_act)
+  - [```show_dialogue(dialogue)```](#show_dialoguedialogue)
+  - [```show_choice(options)```](#show_choiceoptions)
+
+----
+
 ## How to use
 
 Import ```wh_quest/engine.lua``` and initialize the engine:
@@ -21,7 +54,9 @@ engine.init(level, delegate)
 
 After initialization you can call other engine functions, see the documentation below.
 
-### Engine functions
+----
+
+## Engine functions
 
 #### ```engine.init(level, delegate)```
 
@@ -47,7 +82,7 @@ Interact with an NPC. ```npc``` is an NPC identifier. It can be of any type: a s
 
 This function will call level's ```on_act_npc``` function, which should return an interaction coroutine. More details on interaction coroutines in the next section and in ```on_act_npc``` function description.
 
-### NPC interaction helper functions
+## NPC interaction helper functions
 
 #### ```engine.show_dialogue(dialogue)```
 
@@ -89,14 +124,27 @@ Call this from GUI when you finish showing a dialogue.
 
 Call this from GUI when user selects an answer.
 
-### Inventory module functions
+## Inventory module functions
 
-#### engine.inventory.pick_item(item)
+Inventory is a built-in module of whDefQuest and provides basic inventory management functions. You can limit the maximum number of items in the inventory by settings ```engine.inventory.max_items``` field. If the inventory should be unlimited, set it to ```nil``` (it's a default value).
 
-#### engine.inventory.remove_item(item)
+#### ```engine.inventory.pick_item(item)```
 
-#### engine.inventory.has_item(item)
+Add an item to inventory. ```item``` is the item's identifier. Just like NPC identifier, it can be of any type – string, Defold hash, etc.
 
+This function will call level's ```on_pick_item(item)``` function and delegate's functions:
+
+- ```on_pick_item(item)``` – if the item was successfully picked (good place for the code to remove the picked item from the map)
+- ```on_inventory_full()``` – it the inventory is full
+- ```on_update_inventory(items)``` – to redraw the inventory
+
+#### ```engine.inventory.remove_item(item)```
+
+Remove an item from inventory. Does nothing if there's no such item. Will call delegate's ```on_update_inventory(items)``` to redraw the inventory.
+
+#### ```engine.inventory.has_item(item)```
+
+Checks if there's an ```item``` in the inventory. Use this in your level code.
 
 ----
 
@@ -126,4 +174,3 @@ Call this from GUI when user selects an answer.
 #### ```show_dialogue(dialogue)```
 
 #### ```show_choice(options)```
-
